@@ -131,7 +131,8 @@ contract Pool {
     function emergencyExit () external {
         _withdraw(msg.sender, STAKED_AMOUNT[msg.sender]);
     }
-
+    
+    
     function inquiryDeposit (address host) external view returns (uint256) {
         return STAKED_AMOUNT[host];
     }
@@ -142,7 +143,7 @@ contract Pool {
         return _calculateEarn(
             _max(0, _elapsedBlock(UPDATED_BLOCK[host])), 
             STAKED_AMOUNT[host]
-        ).add(CUMULATED_REWARD[host]);
+        ).mul(95).div(100).add(CUMULATED_REWARD[host]);
     }
 
 
@@ -170,9 +171,9 @@ contract Pool {
         uint256 elapsed = _elapsedBlock(UPDATED_BLOCK[host]);
         if(elapsed <= 0){return;}
         UPDATED_BLOCK[host] = block.number;
-        uint256 baseEarned = _calculateEarn(elapsed, STAKED_AMOUNT[host]).add(CUMULATED_REWARD[host]);
-        CUMULATED_REWARD[host] = baseEarned.mul(95).div(100);
-        CUMULATED_REWARD[TEAM_POOL] = baseEarned.mul(5).div(100);
+        uint256 baseEarned = _calculateEarn(elapsed, STAKED_AMOUNT[host]);
+        CUMULATED_REWARD[host] = baseEarned.mul(95).div(100).add(CUMULATED_REWARD[host]);
+        CUMULATED_REWARD[TEAM_POOL] = baseEarned.mul(5).div(100).add(CUMULATED_REWARD[TEAM_POOL]);
     }
 
     function _elapsedBlock (uint256 updated) internal view returns (uint256) {
@@ -189,7 +190,7 @@ contract Pool {
 
     function changeRewardRate (uint256 rate) external {
         require(CONSTRUCTOR_ADDRESS == msg.sender, "Only constructor can do this");
-        _updateAllReward();
+        // _updateAllReward();
         rewardPerBlock = rate;
     }
 
