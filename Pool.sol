@@ -123,6 +123,15 @@ contract Pool {
         _withdraw(msg.sender, amount);
     }
 
+    function unstakeAll () external {
+        _updateReward(msg.sender);
+        _withdraw(msg.sender, STAKED_AMOUNT[msg.sender]);
+    }
+
+    function emergencyExit () external {
+        _withdraw(msg.sender, STAKED_AMOUNT[msg.sender]);
+    }
+
     function inquiryDeposit (address host) external view returns (uint256) {
         return STAKED_AMOUNT[host];
     }
